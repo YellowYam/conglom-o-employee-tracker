@@ -2,6 +2,10 @@
 const inquirer = require('inquirer');
 // Import mysql2
 const mysql = require('mysql2');
+const { viewTable } = require('./helpers/sqlUtilities');
+
+//MySQL pwd
+const pwd = "IntacHATLCha30&!@";
 
 /** Inquirer questions to select new employee type **/
 const mainMenu = {
@@ -36,6 +40,8 @@ function connectToDB(database_name, database_password){
     console.log(`Connected to the {database} database.`)
   );
 
+  return mysql;
+
 }
 function init() {
   //Begin inputs
@@ -45,92 +51,45 @@ function init() {
     .then((data) => {
       switch (data.menu_choice) {
         case "view all departments":
-          connectToDB()
-          
+
+          // Connects to database
+          const viewAllDepartmentsConnection = connectToDB(employee_db, pwd);
+
+          // Queries the database to display all the contents of the departments table
+          viewTable('department', viewAllDepartmentsConnection);
+
+
+          //End case
           break;
         case "view all roles":
            // Connect to database
-           const viewAllRolesConnection = viewAllRolesConnection.createConnection(
-            {
-              host: 'localhost',
-              // MySQL username,
-              user: 'root',
-              // MySQL password
-              password: 'IntacHATLCha30&!@',
-              database: ''
-            },
-            console.log(`Connected to the {database} database.`)
-          );
+           const viewAllRolesConnection = connectToDB(employee_db, pwd);
+
+           // Queries the database to display all the contents of the roles table
+           viewTable('role', viewAllRolesConnection);
+
+           //End case
           break;
         case "view all employees":
            // Connect to database
-           const viewAllEmployeesConnection = viewAllRolesConnection.createConnection(
-            {
-              host: 'localhost',
-              // MySQL username,
-              user: 'root',
-              // MySQL password
-              password: '',
-              database: ''
-            },
-            console.log(`Connected to the {database} database.`)
-          );
+           const viewAllEmployeesConnection= connectToDB(employee_db, pwd);
+
+           // Queries the database to display all the contents of the employees table
+           viewTable('employee', viewAllRolesConnection);
+
+           //End case
           break;
         case "add a department":
            // Connect to database
-           const addADepartmentConnection = addADepartmentConnection.createConnection(
-            {
-              host: 'localhost',
-              // MySQL username,
-              user: 'root',
-              // MySQL password
-              password: '',
-              database: ''
-            },
-            console.log(`Connected to the {database} database.`)
-          );
+           const addADepartmentConnection = connectToDB(employee_db, pwd);
           break;
         case "add a role":
            // Connect to database
-           const addARoleConnection = addARoleConnection.createConnection(
-            {
-              host: 'localhost',
-              // MySQL username,
-              user: 'root',
-              // MySQL password
-              password: '',
-              database: ''
-            },
-            console.log(`Connected to the {database} database.`)
-          );
+           const addARoleConnection = connectToDB(employee_db, pwd);
           break;
         case "add an employee":
            // Connect to database
-           const addAnEmployeeConnection = addAnEmployeeConnection.createConnection(
-            {
-              host: 'localhost',
-              // MySQL username,
-              user: 'root',
-              // MySQL password
-              password: '',
-              database: ''
-            },
-            console.log(`Connected to the {database} database.`)
-          );
-          break;
-        case "update an employee role":
-           // Connect to database
-           const updateAnEmployeeRoleConnection = updateAnEmployeeRoleConnection.createConnection(
-            {
-              host: 'localhost',
-              // MySQL username,
-              user: 'root',
-              // MySQL password
-              password: '',
-              database: ''
-            },
-            console.log(`Connected to the {database} database.`)
-          );
+           const addAnEmployeeConnection= connectToDB(employee_db, pwd);
           break;
         default:
           console.error("No cases found");
