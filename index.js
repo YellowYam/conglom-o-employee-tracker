@@ -1,4 +1,4 @@
-const { processMenuSelection } = require('./helpers/sqlUtilities');
+const { processMenuSelection } = require('./helpers/menuProcessor');
 const { loadMainMenu } = require('./helpers/menuLoader');
 
 //Employee Manager Database

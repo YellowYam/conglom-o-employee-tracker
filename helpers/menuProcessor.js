@@ -1,12 +1,17 @@
 // Import mysql2
 const mysql = require('mysql2');
+
 // Import menu loader
-const { loadMainMenu, loadDepartmentCreator, loadRoleCreator, loadEmployeeCreator, loadEmployeeRoleUpdater } = require('./menuLoader');
+const { loadMainMenu, loadDepartmentCreator, loadRoleCreator,
+        loadEmployeeCreator, loadEmployeeRoleUpdater } 
+        = require('./menuLoader');
+
 //MySQL pwd 
 const hash = "$2b$10$pipQC4y8evva8jf3thP3q./Bb87l7nP9EqF7aMBJel6ZpoDzFJzmu";
 //Employee Manager Database
 const employee_db = "employee_db";
 
+// Function takes a database name and its password and returns a connection object in a variable.
 function connectToDB(database_name, database_password) {
   // Connect to database
   const db = mysql.createConnection(
@@ -25,7 +30,7 @@ function connectToDB(database_name, database_password) {
 
 }
 
-
+/******** These functions include prepared statements **************/
 function viewTable(table_name, connection) {
   // Queries the database to display all the contents of the departments table
   connection.promise().query(`SELECT * FROM ${table_name}`)
@@ -78,7 +83,7 @@ function addEmployee(first_name, last_name, role_id, manager_id, connection) {
 }
 
 function updateEmployeeRole(employee_id, newRole_id, connection) {
-  // Queries the database to add an employee
+  // Queries the database to update an employee role
   connection.promise().query(`UPDATE employee SET role_id = "${newRole_id}" WHERE id = ${employee_id}`)
     .then(([rows]) => {
       console.table(rows);
@@ -90,21 +95,30 @@ function updateEmployeeRole(employee_id, newRole_id, connection) {
 
 
 }
+
+
+
+
+
+
+
+
+/******  This function handles new menu selections ******/
+
 function processMenuSelection(data) {
+  // Switch for possible menu imputs
   switch (data.menu_choice) {
+    
     case "view all departments":
-
-
       // Connects to database
       const viewAllDepartmentsConnection = connectToDB(employee_db, hash);
 
       // Queries the database to display all the contents of the departments table
-      viewTable('department', viewAllDepartmentsConnection);
-
-
+      viewTable('department', viewAllDepartmentsConnection);  // viewTable instantiates a new main-menu prompt
 
       //End case
       break;
+
     case "view all roles":
       // Connect to database
       const viewAllRolesConnection = connectToDB(employee_db, hash);
@@ -115,6 +129,7 @@ function processMenuSelection(data) {
 
       //End case
       break;
+
     case "view all employees":
       // Connect to database
       const viewAllEmployeesConnection = connectToDB(employee_db, hash);
@@ -124,15 +139,19 @@ function processMenuSelection(data) {
 
       //End case
       break;
+
     case "add a department":
       // Connect to database
       const addADepartmentConnection = connectToDB(employee_db, hash);
+
+      // Department creator uses inquirer
       loadDepartmentCreator()
-        .then((data) => { addDepartment(data.department_name, addADepartmentConnection) })
+        .then((data) => { addDepartment(data.department_name, addADepartmentConnection) }) //Prepared statment
         .catch(err => console.error(err));
 
 
       break;
+      
     case "add a role":
       // Connect to database
       const addARoleConnection = connectToDB(employee_db, hash);
@@ -287,4 +306,4 @@ function processMenuSelection(data) {
   }
 }
 
-module.exports = { connectToDB, viewTable, addDepartment, addEmployee, processMenuSelection };
+module.exports = { processMenuSelection };
