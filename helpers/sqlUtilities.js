@@ -1,9 +1,9 @@
 // Import mysql2
 const mysql = require('mysql2');
 // Import menu loader
-const { loadMainMenu, loadDepartmentCreator, loadRoleCreator , loadEmployeeCreator} = require('./menuLoader');
-//MySQL pwd
-const pwd = "IntacHATLCha30&!@";
+const { loadMainMenu, loadDepartmentCreator, loadRoleCreator, loadEmployeeCreator } = require('./menuLoader');
+//MySQL pwd 
+const hash = "$2b$10$pipQC4y8evva8jf3thP3q./Bb87l7nP9EqF7aMBJel6ZpoDzFJzmu";
 //Employee Manager Database
 const employee_db = "employee_db";
 
@@ -82,7 +82,7 @@ function processMenuSelection(data) {
 
 
       // Connects to database
-      const viewAllDepartmentsConnection = connectToDB(employee_db, pwd);
+      const viewAllDepartmentsConnection = connectToDB(employee_db, hash);
 
       // Queries the database to display all the contents of the departments table
       viewTable('department', viewAllDepartmentsConnection);
@@ -93,7 +93,7 @@ function processMenuSelection(data) {
       break;
     case "view all roles":
       // Connect to database
-      const viewAllRolesConnection = connectToDB(employee_db, pwd);
+      const viewAllRolesConnection = connectToDB(employee_db, hash);
 
       // Queries the database to display all the contents of the roles table
       viewTable('role', viewAllRolesConnection);
@@ -103,7 +103,7 @@ function processMenuSelection(data) {
       break;
     case "view all employees":
       // Connect to database
-      const viewAllEmployeesConnection = connectToDB(employee_db, pwd);
+      const viewAllEmployeesConnection = connectToDB(employee_db, hash);
 
       // Queries the database to display all the contents of the employees table
       viewTable('employee', viewAllEmployeesConnection);
@@ -112,7 +112,7 @@ function processMenuSelection(data) {
       break;
     case "add a department":
       // Connect to database
-      const addADepartmentConnection = connectToDB(employee_db, pwd);
+      const addADepartmentConnection = connectToDB(employee_db, hash);
       loadDepartmentCreator()
         .then((data) => { addDepartment(data.department_name, addADepartmentConnection) })
         .catch(err => console.error(err));
@@ -121,63 +121,92 @@ function processMenuSelection(data) {
       break;
     case "add a role":
       // Connect to database
-      const addARoleConnection = connectToDB(employee_db, pwd);
+      const addARoleConnection = connectToDB(employee_db, hash);
 
       addARoleConnection.promise().query('SELECT * FROM department')
         .then(([rows]) => {
-         const departments = []; 
-         for(let i = 0; i < rows.length ; i++){
+          const departments = [];
+          for (let i = 0; i < rows.length; i++) {
             departments.push(rows[i].department_name);
-         };
-         
-         
+          };
+
+
           loadRoleCreator(departments, rows)
-            .then((data) => { 
-            
+            .then((data) => {
+
               // A filter function to retrieve the id for the ammended department
-              function findDepartment(row){
+              function findDepartment(row) {
                 return row.department_name === data.department;
               }
 
               const department = rows.filter(findDepartment)[0].id;
 
-            
-            
-              addRole(data.role_name, data.salary, department, addARoleConnection) })
+
+
+              addRole(data.role_name, data.salary, department, addARoleConnection)
+            })
             .catch(err => console.error(err));
         })
         .catch(err => console.error(err));
 
-          break;
+      break;
     case "add an employee":
       // Connect to database
-      const addAnEmployeeConnection = connectToDB(employee_db, pwd);
+      const addAnEmployeeConnection = connectToDB(employee_db, hash);
 
-      const roles = []; 
+      const roles = [];
       const employees = [];
 
       addAnEmployeeConnection.promise().query('SELECT * FROM role')
-      .then(([rows]) => {
-        for(let i = 0; i < rows.length ; i++){
-           roles.push(rows[i].title);
-        };
-      })
-      .then(
+        .then(([roleRows]) => {
+          for (let i = 0; i < rows.length; i++) {
+            roles.push(roleRows[i].title);
+          };
+          return roleRows;
+        })
+        .then(([roleRows]) => {
 
-        addAnEmployeeConnection.promise().query('SELECT * FROM employee')
-      .then(([rows]) => {
-        for(let i = 0; i < rows.length ; i++){
-           employees.push(`${rows[i].first_name} ${rows[i].last_name}`);
-        };
-      })
-      .catch(err => console.error(err))
-      
-      )
+          const roleRows = roleRows;
 
-      
+          addAnEmployeeConnection.promise().query('SELECT * FROM employee')
+            .then(([employeeRows]) => {
+              for (let i = 0; i < rows.length; i++) {
+                employees.push(`${employeeRows[i].first_name} ${employeeRows[i].last_name}`);
+              };
 
-      loadEmployeeCreator(roles, employees);
-  
+
+              loadEmployeeCreator(roles, employees)
+                .then((data) => {
+
+                  // A filter function to retrieve the id for the ammended department
+                  function findRole(row) {
+                    return row.title === data.role;
+                  }
+
+                  // A filter function to retrieve the id for the ammended department
+                  function findRole(row) {
+                    return row.title === data.role;
+                  }
+
+                  const department = rows.filter(findDepartment)[0].id;
+
+
+
+                  addEmployee(data.first_name, data.last_name, department, addARoleConnection)
+                })
+                .catch(err => console.error(err));
+
+
+            })
+            .catch(err => console.error(err))
+        }
+
+        )
+        .catch(err => console.error(err));
+
+
+
+
       break;
     default:
       console.error("No cases found");

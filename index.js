@@ -1,8 +1,6 @@
 const { processMenuSelection } = require('./helpers/sqlUtilities');
 const { loadMainMenu } = require('./helpers/menuLoader');
 
-//MySQL pwd
-const pwd = "IntacHATLCha30&!@";
 //Employee Manager Database
 const employee_db = "employee_db";
 
