@@ -1,7 +1,7 @@
 // Import mysql2
 const mysql = require('mysql2');
 // Import menu loader
-const {loadMainMenu} = require('./menuLoader');
+const {loadMainMenu, loadDepartmentCreator} = require('./menuLoader');
 //MySQL pwd
 const pwd = "IntacHATLCha30&!@";
 //Employee Manager Database
@@ -38,6 +38,27 @@ function viewTable(table_name, connection){
         .catch((err) => console.error(err));
 }
 
+function addDepartment(department_name, connection){
+   // Queries the database to display all the contents of the departments table
+   connection.promise().query(`INSERT INTO department (department_name) VALUES("${department_name}")`)
+   .then(([rows]) => {
+       console.table(rows);
+       loadMainMenu()
+       .then((data) => {processMenuSelection(data)})
+       .catch(err => console.error(err));
+ })
+   .catch((err) => console.error(err));
+    
+}
+
+function addRole(){
+
+}
+
+function addEmployee(){
+
+
+}
 function processMenuSelection(data) {
   switch (data.menu_choice) {
     case "view all departments":
@@ -75,6 +96,11 @@ function processMenuSelection(data) {
     case "add a department":
        // Connect to database
        const addADepartmentConnection = connectToDB(employee_db, pwd);
+       loadDepartmentCreator()
+       .then((data) => {addDepartment(data.department_name, addADepartmentConnection)})
+       .catch(err => console.error(err));
+       
+
       break;
     case "add a role":
        // Connect to database
@@ -90,4 +116,4 @@ function processMenuSelection(data) {
   }
 }
 
-module.exports = {connectToDB, viewTable, processMenuSelection};
+module.exports = {connectToDB, viewTable, addDepartment, processMenuSelection};

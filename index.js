@@ -27,7 +27,7 @@ function init() {
  
   //Load main menu
   loadMainMenu()
-  .then((data) => {processMenuSelection(data)})
+  .then((data) => {processMenuSelection(data)})  // Processes this information recursively
   .catch(err => console.error(err));
 }
   

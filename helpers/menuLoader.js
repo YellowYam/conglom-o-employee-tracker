@@ -10,6 +10,15 @@ const mainMenu = {
       'add an employee', 'update an employee role'],
   };
 
+  /** Inquirer questions to create a new department **/
+const departmentCreator = {
+    type: 'input',
+    name: 'department_name',
+    message: 'What shall the department be named?',
+  };
+
+  
+
 
   function loadMainMenu(){
 
@@ -18,7 +27,12 @@ const mainMenu = {
       .prompt(mainMenu);
   }
 
+  function loadDepartmentCreator(){
+
+    return inquirer
+        .prompt(departmentCreator);
+  }
   
 
 
-  module.exports = {loadMainMenu};
+  module.exports = {loadMainMenu, loadDepartmentCreator};
