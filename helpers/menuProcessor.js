@@ -1,5 +1,7 @@
 // Import mysql2
 const mysql = require('mysql2');
+// Import console.table
+const cTable = require('console.table');
 
 // Import menu loader
 const { loadMainMenu, loadDepartmentCreator, loadRoleCreator,
@@ -41,6 +43,48 @@ function viewTable(table_name, connection) {
         .catch(err => console.error(err));
     })
     .catch((err) => console.error(err));
+}
+
+function viewRolesTable(connection){
+  //Queries the database to display all the contents of the roles table
+  connection.promise().query(`SELECT role.id AS id, role.title AS title, role.salary AS salary, 
+                              department.department_name AS department 
+                              FROM role 
+                              JOIN department 
+                              ON role.department_id = department.id`)
+  .then(([rows]) => {
+    console.table(rows);
+    loadMainMenu()
+      .then((data) => { processMenuSelection(data) })
+      .catch(err => console.error(err));
+  })
+  .catch((err) => console.error(err));
+}
+
+function viewEmployeesTable(connection){
+   //Queries the database to display all the contents of the employees table
+   connection.promise().query(`SELECT employee.id AS ID, employee.first_name AS First_Name,
+                               employee.last_name AS Last_Name, 
+                               IFNULL(role.title, "No title") AS Title,
+                               IFNULL(role.salary, "No salary") AS Salary,
+                               IFNULL(department.department_name, "No Department") AS Department,
+                               IFNULL(CONCAT(manager.first_name, " ",  manager.last_name), "No Manager") AS Manager
+                               FROM employee 
+                               INNER JOIN role 
+                               ON employee.role_id = role.id 
+                               INNER JOIN department 
+                               ON role.department_id = department.id
+                               LEFT JOIN employee AS manager 
+                               ON manager.id = employee.manager_id
+                               ORDER BY role.salary`)
+   .then(([rows]) => {
+     console.table(rows);
+     loadMainMenu()
+       .then((data) => { processMenuSelection(data) })
+       .catch(err => console.error(err));
+   })
+   .catch((err) => console.error(err));
+
 }
 
 function addDepartment(department_name, connection) {
@@ -124,7 +168,7 @@ function processMenuSelection(data) {
       const viewAllRolesConnection = connectToDB(employee_db, hash);
 
       // Queries the database to display all the contents of the roles table
-      viewTable('role', viewAllRolesConnection);
+      viewRolesTable(viewAllRolesConnection);
 
 
       //End case
@@ -135,7 +179,7 @@ function processMenuSelection(data) {
       const viewAllEmployeesConnection = connectToDB(employee_db, hash);
 
       // Queries the database to display all the contents of the employees table
-      viewTable('employee', viewAllEmployeesConnection);
+      viewEmployeesTable(viewAllEmployeesConnection);
 
       //End case
       break;
@@ -151,7 +195,7 @@ function processMenuSelection(data) {
 
 
       break;
-      
+
     case "add a role":
       // Connect to database
       const addARoleConnection = connectToDB(employee_db, hash);
