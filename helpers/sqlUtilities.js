@@ -63,7 +63,7 @@ function addRole(role_name, salary, department_id, connection) {
     .catch((err) => console.error(err));
 }
 
-function addEmployee(first_name, last_name, role_id, manager_id) {
+function addEmployee(first_name, last_name, role_id, manager_id, connection) {
   // Queries the database to add an employee
   connection.promise().query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES("${first_name}", "${last_name}", ${role_id}, ${manager_id})`)
     .then(([rows]) => {
@@ -155,22 +155,20 @@ function processMenuSelection(data) {
       const addAnEmployeeConnection = connectToDB(employee_db, hash);
 
       const roles = [];
-      const employees = [];
+      const employees = ['None'];
 
       addAnEmployeeConnection.promise().query('SELECT * FROM role')
         .then(([roleRows]) => {
-          for (let i = 0; i < rows.length; i++) {
+          for (let i = 0; i < roleRows.length; i++) {
             roles.push(roleRows[i].title);
           };
-          return roleRows;
+          return [roleRows];
         })
         .then(([roleRows]) => {
 
-          const roleRows = roleRows;
-
           addAnEmployeeConnection.promise().query('SELECT * FROM employee')
             .then(([employeeRows]) => {
-              for (let i = 0; i < rows.length; i++) {
+              for (let i = 0; i < employeeRows.length; i++) {
                 employees.push(`${employeeRows[i].first_name} ${employeeRows[i].last_name}`);
               };
 
@@ -178,21 +176,24 @@ function processMenuSelection(data) {
               loadEmployeeCreator(roles, employees)
                 .then((data) => {
 
+                  console.log(data);
+            
                   // A filter function to retrieve the id for the ammended department
                   function findRole(row) {
                     return row.title === data.role;
                   }
 
                   // A filter function to retrieve the id for the ammended department
-                  function findRole(row) {
-                    return row.title === data.role;
+                  function findManager(row) {
+                    return row.first_name + " " + row.last_name === data.manager;
                   }
 
-                  const department = rows.filter(findDepartment)[0].id;
+                  const role = roleRows.filter(findRole)[0].id;
+                  const manager = employeeRows.filter(findManager)[0].id;
 
 
 
-                  addEmployee(data.first_name, data.last_name, department, addARoleConnection)
+                  addEmployee(data.first_name, data.last_name, role, manager, addAnEmployeeConnection);
                 })
                 .catch(err => console.error(err));
 
