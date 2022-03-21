@@ -33,7 +33,7 @@ function loadDepartmentCreator() {
         .prompt(departmentCreator);
 }
 
-function loadRoleCreator(roles) {
+function loadRoleCreator(departments) {
 
     /** Inquirer questions to create a new role **/
     const roleCreator = [
@@ -51,7 +51,7 @@ function loadRoleCreator(roles) {
             type: 'list',
             name: 'department',
             message: 'To which department shall this role belong?',
-            choices: roles
+            choices: departments
         },
     ];
 
@@ -59,5 +59,36 @@ function loadRoleCreator(roles) {
         .prompt(roleCreator);
 }
 
+function loadEmployeeCreator(roles, employees){
+     /** Inquirer questions to create a new employee **/
+     const employeeCreator = [
+        {
+            type: 'input',
+            name: 'first_name',
+            message: 'What is the employee\'s first name?',
+        },
+        {
+            type: 'input',
+            name: 'last_name',
+            message: 'What is the employee\'s last name?',
+        },
+        {
+            type: 'list',
+            name: 'role',
+            message: 'Choose a role for the employee:',
+            choices: roles
+        },
+        {
+            type: 'list',
+            name: 'manager',
+            message: 'Who is the employee\'s manager?',
+            choices: employees
+        },
+    ];
 
-module.exports = { loadMainMenu, loadDepartmentCreator, loadRoleCreator };
+    return inquirer
+    .prompt(employeeCreator);
+}
+
+
+module.exports = { loadMainMenu, loadDepartmentCreator, loadRoleCreator, loadEmployeeCreator};
