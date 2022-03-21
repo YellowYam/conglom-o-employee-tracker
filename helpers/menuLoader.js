@@ -90,5 +90,25 @@ function loadEmployeeCreator(roles, employees){
     .prompt(employeeCreator);
 }
 
+function loadEmployeeRoleUpdater(roles, employees){
+    /** Inquirer questions to create a new employee **/
+    const employeeRoleUpdater = [
+        {
+            type: 'list',
+            name: 'employee',
+            message: 'Which employee shall be updated?',
+            choices: employees
+        },
+        {
+            type: 'list',
+            name: 'role',
+            message: 'Choose a new role for the employee:',
+            choices: roles
+        },
+    ];
 
-module.exports = { loadMainMenu, loadDepartmentCreator, loadRoleCreator, loadEmployeeCreator};
+    return inquirer
+    .prompt(employeeRoleUpdater);
+
+}
+module.exports = { loadMainMenu, loadDepartmentCreator, loadRoleCreator, loadEmployeeCreator, loadEmployeeRoleUpdater};

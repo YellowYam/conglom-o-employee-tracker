@@ -1,7 +1,7 @@
 // Import mysql2
 const mysql = require('mysql2');
 // Import menu loader
-const { loadMainMenu, loadDepartmentCreator, loadRoleCreator, loadEmployeeCreator } = require('./menuLoader');
+const { loadMainMenu, loadDepartmentCreator, loadRoleCreator, loadEmployeeCreator, loadEmployeeRoleUpdater } = require('./menuLoader');
 //MySQL pwd 
 const hash = "$2b$10$pipQC4y8evva8jf3thP3q./Bb87l7nP9EqF7aMBJel6ZpoDzFJzmu";
 //Employee Manager Database
@@ -66,6 +66,20 @@ function addRole(role_name, salary, department_id, connection) {
 function addEmployee(first_name, last_name, role_id, manager_id, connection) {
   // Queries the database to add an employee
   connection.promise().query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES("${first_name}", "${last_name}", ${role_id}, ${manager_id})`)
+    .then(([rows]) => {
+      console.table(rows);
+      loadMainMenu()
+        .then((data) => { processMenuSelection(data) })
+        .catch(err => console.error(err));
+    })
+    .catch((err) => console.error(err));
+
+
+}
+
+function updateEmployeeRole(employee_id, newRole_id, connection) {
+  // Queries the database to add an employee
+  connection.promise().query(`UPDATE employee SET role_id = "${newRole_id}" WHERE id = ${employee_id}`)
     .then(([rows]) => {
       console.table(rows);
       loadMainMenu()
@@ -153,37 +167,41 @@ function processMenuSelection(data) {
     case "add an employee":
       // Connect to database
       const addAnEmployeeConnection = connectToDB(employee_db, hash);
-
+      
+      //The server must be queried to populate these two arrays.
       const roles = [];
       const employees = ['None'];
 
+      //First the application queries all the roles.
       addAnEmployeeConnection.promise().query('SELECT * FROM role')
+        //Then it populates the roles array.
         .then(([roleRows]) => {
           for (let i = 0; i < roleRows.length; i++) {
             roles.push(roleRows[i].title);
           };
+          // These roles are passed to the next step.
           return [roleRows];
         })
         .then(([roleRows]) => {
-
+          // Second the application queries all the employees
           addAnEmployeeConnection.promise().query('SELECT * FROM employee')
+            //Then it populates the employees array.
             .then(([employeeRows]) => {
               for (let i = 0; i < employeeRows.length; i++) {
                 employees.push(`${employeeRows[i].first_name} ${employeeRows[i].last_name}`);
               };
 
-
+              //The employee Creator loads before the end of the async method
               loadEmployeeCreator(roles, employees)
+                // Then this utility processes the creator data.
                 .then((data) => {
-
-                  console.log(data);
             
-                  // A filter function to retrieve the id for the ammended department
+                  // A filter function to retrieve the id for the ammended role
                   function findRole(row) {
                     return row.title === data.role;
                   }
 
-                  // A filter function to retrieve the id for the ammended department
+                  // A filter function to retrieve the id for the ammended employee
                   function findManager(row) {
                     return row.first_name + " " + row.last_name === data.manager;
                   }
@@ -192,7 +210,7 @@ function processMenuSelection(data) {
                   const manager = employeeRows.filter(findManager)[0].id;
 
 
-
+                  //All the processed data is passed to the addEmployee function
                   addEmployee(data.first_name, data.last_name, role, manager, addAnEmployeeConnection);
                 })
                 .catch(err => console.error(err));
@@ -204,10 +222,64 @@ function processMenuSelection(data) {
 
         )
         .catch(err => console.error(err));
+      break;
+    case "update an employee role":
+       // Connect to database
+       const updateAnEmployeeRoleConnection = connectToDB(employee_db, hash);
+
+        //The server must be queried to populate these two arrays.
+      const roleArray = [];
+      const employeeArray = [];
+
+      //First the application queries all the roles.
+      updateAnEmployeeRoleConnection.promise().query('SELECT * FROM role')
+        //Then it populates the roles array.
+        .then(([roleRows]) => {
+          for (let i = 0; i < roleRows.length; i++) {
+            roleArray.push(roleRows[i].title);
+          };
+          // These roles are passed to the next step.
+          return [roleRows];
+        })
+        .then(([roleRows]) => {
+          // Second the application queries all the employees
+          updateAnEmployeeRoleConnection.promise().query('SELECT * FROM employee')
+            //Then it populates the employees array.
+            .then(([employeeRows]) => {
+              for (let i = 0; i < employeeRows.length; i++) {
+                employeeArray.push(`${employeeRows[i].first_name} ${employeeRows[i].last_name}`);
+              };
+
+              //The employee Creator loads before the end of the async method
+              loadEmployeeRoleUpdater(roleArray, employeeArray)
+                // Then this utility processes the creator data.
+                .then((data) => {
+            
+                  // A filter function to retrieve the id for the ammended role
+                  function findRole(row) {
+                    return row.title === data.role;
+                  }
+
+                  // A filter function to retrieve the id for the ammended employee
+                  function findEmployee(row) {
+                    return row.first_name + " " + row.last_name === data.employee;
+                  }
+
+                  const role = roleRows.filter(findRole)[0].id;
+                  const employee = employeeRows.filter(findEmployee)[0].id;
+
+                    //All the processed data is passed to the addEmployee function
+                   updateEmployeeRole(employee, role, updateAnEmployeeRoleConnection);
+                  })
+                  .catch(err => console.error(err));
 
 
-
-
+                })
+                .catch(err => console.error(err))
+            }
+    
+            )
+            .catch(err => console.error(err));
       break;
     default:
       console.error("No cases found");
@@ -215,4 +287,4 @@ function processMenuSelection(data) {
   }
 }
 
-module.exports = { connectToDB, viewTable, addDepartment, processMenuSelection };
+module.exports = { connectToDB, viewTable, addDepartment, addEmployee, processMenuSelection };
