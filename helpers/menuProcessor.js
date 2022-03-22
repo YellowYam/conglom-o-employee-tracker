@@ -155,7 +155,7 @@ function processMenuSelection(data) {
     
     case "view all departments":
       // Connects to database
-      const viewAllDepartmentsConnection = connectToDB(employee_db, hash);
+      var viewAllDepartmentsConnection = connectToDB(employee_db, hash);
 
       // Queries the database to display all the contents of the departments table
       viewTable('department', viewAllDepartmentsConnection);  // viewTable instantiates a new main-menu prompt
@@ -165,7 +165,7 @@ function processMenuSelection(data) {
 
     case "view all roles":
       // Connect to database
-      const viewAllRolesConnection = connectToDB(employee_db, hash);
+      var viewAllRolesConnection = connectToDB(employee_db, hash);
 
       // Queries the database to display all the contents of the roles table
       viewRolesTable(viewAllRolesConnection);
@@ -176,7 +176,7 @@ function processMenuSelection(data) {
 
     case "view all employees":
       // Connect to database
-      const viewAllEmployeesConnection = connectToDB(employee_db, hash);
+      var viewAllEmployeesConnection = connectToDB(employee_db, hash);
 
       // Queries the database to display all the contents of the employees table
       viewEmployeesTable(viewAllEmployeesConnection);
@@ -186,7 +186,7 @@ function processMenuSelection(data) {
 
     case "add a department":
       // Connect to database
-      const addADepartmentConnection = connectToDB(employee_db, hash);
+      var addADepartmentConnection = connectToDB(employee_db, hash);
 
       // Department creator uses inquirer
       loadDepartmentCreator()
@@ -198,14 +198,14 @@ function processMenuSelection(data) {
 
     case "add a role":
       // Connect to database
-      const addARoleConnection = connectToDB(employee_db, hash);
+      var addARoleConnection = connectToDB(employee_db, hash);
 
       addARoleConnection.promise().query('SELECT * FROM department')
         .then(([rows]) => {
-          const departments = [];
+          var departments = [];
           for (let i = 0; i < rows.length; i++) {
             departments.push(rows[i].department_name);
-          };
+          }
 
 
           loadRoleCreator(departments, rows)
@@ -229,11 +229,11 @@ function processMenuSelection(data) {
       break;
     case "add an employee":
       // Connect to database
-      const addAnEmployeeConnection = connectToDB(employee_db, hash);
+      var addAnEmployeeConnection = connectToDB(employee_db, hash);
       
       //The server must be queried to populate these two arrays.
-      const roles = [];
-      const employees = ['None'];
+      var roles = [];
+      var employees = ['None'];
 
       //First the application queries all the roles.
       addAnEmployeeConnection.promise().query('SELECT * FROM role')
@@ -241,7 +241,7 @@ function processMenuSelection(data) {
         .then(([roleRows]) => {
           for (let i = 0; i < roleRows.length; i++) {
             roles.push(roleRows[i].title);
-          };
+          }
           // These roles are passed to the next step.
           return [roleRows];
         })
@@ -252,7 +252,7 @@ function processMenuSelection(data) {
             .then(([employeeRows]) => {
               for (let i = 0; i < employeeRows.length; i++) {
                 employees.push(`${employeeRows[i].first_name} ${employeeRows[i].last_name}`);
-              };
+              }
 
               //The employee Creator loads before the end of the async method
               loadEmployeeCreator(roles, employees)
@@ -269,8 +269,8 @@ function processMenuSelection(data) {
                     return row.first_name + " " + row.last_name === data.manager;
                   }
 
-                  const role = roleRows.filter(findRole)[0].id;
-                  const manager = employeeRows.filter(findManager)[0].id;
+                  var role = roleRows.filter(findRole)[0].id;
+                  var manager = employeeRows.filter(findManager)[0].id;
 
 
                   //All the processed data is passed to the addEmployee function
@@ -288,11 +288,11 @@ function processMenuSelection(data) {
       break;
     case "update an employee role":
        // Connect to database
-       const updateAnEmployeeRoleConnection = connectToDB(employee_db, hash);
+       var updateAnEmployeeRoleConnection = connectToDB(employee_db, hash);
 
         //The server must be queried to populate these two arrays.
-      const roleArray = [];
-      const employeeArray = [];
+      var roleArray = [];
+      var employeeArray = [];
 
       //First the application queries all the roles.
       updateAnEmployeeRoleConnection.promise().query('SELECT * FROM role')
@@ -300,7 +300,7 @@ function processMenuSelection(data) {
         .then(([roleRows]) => {
           for (let i = 0; i < roleRows.length; i++) {
             roleArray.push(roleRows[i].title);
-          };
+          }
           // These roles are passed to the next step.
           return [roleRows];
         })
@@ -311,7 +311,7 @@ function processMenuSelection(data) {
             .then(([employeeRows]) => {
               for (let i = 0; i < employeeRows.length; i++) {
                 employeeArray.push(`${employeeRows[i].first_name} ${employeeRows[i].last_name}`);
-              };
+              }
 
               //The employee Creator loads before the end of the async method
               loadEmployeeRoleUpdater(roleArray, employeeArray)
@@ -328,8 +328,8 @@ function processMenuSelection(data) {
                     return row.first_name + " " + row.last_name === data.employee;
                   }
 
-                  const role = roleRows.filter(findRole)[0].id;
-                  const employee = employeeRows.filter(findEmployee)[0].id;
+                  var role = roleRows.filter(findRole)[0].id;
+                  var employee = employeeRows.filter(findEmployee)[0].id;
 
                     //All the processed data is passed to the addEmployee function
                    updateEmployeeRole(employee, role, updateAnEmployeeRoleConnection);
