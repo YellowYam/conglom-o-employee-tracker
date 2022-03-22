@@ -5,7 +5,7 @@ const cTable = require('console.table');
 
 // Import menu loader
 const { loadMainMenu, loadDepartmentCreator, loadRoleCreator,
-        loadEmployeeCreator, loadEmployeeRoleUpdater } 
+        loadEmployeeCreator, loadEmployeeRoleUpdater, loadEmployeeViewMenu } 
         = require('./menuLoader');
 
 //MySQL pwd 
@@ -75,8 +75,7 @@ function viewEmployeesTable(connection){
                                INNER JOIN department 
                                ON role.department_id = department.id
                                LEFT JOIN employee AS manager 
-                               ON manager.id = employee.manager_id
-                               ORDER BY role.salary`)
+                               ON manager.id = employee.manager_id`)
    .then(([rows]) => {
      console.table(rows);
      loadMainMenu()
@@ -85,6 +84,48 @@ function viewEmployeesTable(connection){
    })
    .catch((err) => console.error(err));
 
+}
+
+// View Employees by Manager
+function viewEmployeesByManagerTable(connection){
+  //Queries the database to display employees by manager
+  connection.promise().query(`SELECT employee.id AS ID, employee.first_name AS First_Name,
+  employee.last_name AS Last_Name, employee.manager_id AS Manager_ID,
+  IFNULL(CONCAT(manager.first_name, " ",  manager.last_name), "No Manager") AS Manager
+  FROM employee 
+  LEFT JOIN employee AS manager 
+  ON manager.id = employee.manager_id
+  ORDER BY employee.manager_id`)
+  .then(([rows]) => {
+    console.table(rows);
+    loadMainMenu()
+      .then((data) => { processMenuSelection(data) })
+      .catch(err => console.error(err));
+  })
+  .catch((err) => console.error(err));
+}
+
+
+
+// View Employees by Department
+function viewEmployeesByDepartmentTable(connection){
+  //Queries the database to display employees by department
+  connection.promise().query(`SELECT employee.id AS ID, employee.first_name AS First_Name,
+  employee.last_name AS Last_Name, role.department_id AS Department_ID, department.department_name AS Department
+  FROM employee 
+  LEFT JOIN role AS role 
+  ON employee.role_id = role.id
+  LEFT JOIN department AS department
+  ON role.department_id = department.id
+  ORDER BY department.id`)
+  .then(([rows]) => {
+    console.table(rows);
+    loadMainMenu()
+      .then((data) => { processMenuSelection(data) })
+      .catch(err => console.error(err));
+  })
+  .catch((err) => console.error(err));
+  
 }
 
 function addDepartment(department_name, connection) {
@@ -141,7 +182,19 @@ function updateEmployeeRole(employee_id, newRole_id, connection) {
 }
 
 
+// Update Employee manager
 
+function updateEmployeeManager(employee_id, newManager_id, connection){
+
+}
+
+// Delete Department
+
+// Delete Role
+
+// Delete Employee
+
+// View total utilized budget for department (sum all employee salaries)
 
 
 
@@ -179,7 +232,19 @@ function processMenuSelection(data) {
       var viewAllEmployeesConnection = connectToDB(employee_db, hash);
 
       // Queries the database to display all the contents of the employees table
-      viewEmployeesTable(viewAllEmployeesConnection);
+      loadEmployeeViewMenu()
+      .then((view) => {
+        console.log(view);
+        if(view.order === "Manager") {
+          viewEmployeesByManagerTable(viewAllEmployeesConnection);}
+        else if(view.order === "Department") {
+          viewEmployeesByDepartmentTable(viewAllEmployeesConnection);}
+        else if(view.order === "ID"){
+           viewEmployeesTable(viewAllEmployeesConnection);}
+        else{new Error("Could not view table")};
+      })
+      .catch(err => console.error(err));
+      
 
       //End case
       break;

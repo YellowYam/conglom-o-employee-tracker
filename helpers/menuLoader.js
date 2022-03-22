@@ -111,4 +111,23 @@ function loadEmployeeRoleUpdater(roles, employees){
     .prompt(employeeRoleUpdater);
 
 }
-module.exports = { loadMainMenu, loadDepartmentCreator, loadRoleCreator, loadEmployeeCreator, loadEmployeeRoleUpdater};
+
+function loadEmployeeViewMenu(){
+    /** Inquirer questions to create a new employee **/
+    const employeeView = [
+        {
+            type: 'list',
+            name: 'order',
+            message: 'View employees by: ',
+            choices: ['ID', 'Manager', 'Department']
+        },
+    ];
+
+    return inquirer
+    .prompt(employeeView);
+
+}
+
+
+module.exports = { loadMainMenu, loadDepartmentCreator, loadRoleCreator, 
+                   loadEmployeeCreator, loadEmployeeRoleUpdater, loadEmployeeViewMenu};
