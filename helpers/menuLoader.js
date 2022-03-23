@@ -9,7 +9,7 @@ function loadMainMenu() {
         name: 'menu_choice',
         message: 'Main Menu: ',
         choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role',
-            'add an employee', 'update an employee role'],
+            'add an employee', 'update an employee role', 'view department total utilized budget'],
     };
 
     return inquirer
@@ -128,6 +128,20 @@ function loadEmployeeViewMenu(){
 
 }
 
+function loadBudgetViewer(departments){
+    /** Inquirer questions to create a new employee **/
+    const departmentSelector = [
+        {
+            type: 'list',
+            name: 'name',
+            message: 'For which department shall the budget be viewed?',
+            choices: departments
+        },
+    ];
 
+    return inquirer
+    .prompt(departmentSelector);
+
+}
 module.exports = { loadMainMenu, loadDepartmentCreator, loadRoleCreator, 
-                   loadEmployeeCreator, loadEmployeeRoleUpdater, loadEmployeeViewMenu};
+                   loadEmployeeCreator, loadEmployeeRoleUpdater, loadEmployeeViewMenu, loadBudgetViewer};
