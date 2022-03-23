@@ -6,7 +6,7 @@ const cTable = require('console.table');
 // Import menu loader
 const { loadMainMenu, loadDepartmentCreator, loadRoleCreator,
   loadEmployeeCreator, loadEmployeeRoleUpdater, loadEmployeeViewMenu,
-  loadBudgetViewer }
+  loadBudgetViewer, loadEmployeeManagerUpdater }
   = require('./menuLoader');
 
 //MySQL pwd 
@@ -33,7 +33,14 @@ function connectToDB(database_name, database_password) {
 
 }
 
+/*******************************************************************/
+
+/*******************************************************************/
 /******** These functions include prepared statements **************/
+/*******************************************************************/
+
+/*******************************************************************/
+
 function viewTable(table_name, connection) {
   // Queries the database to display all the contents of the departments table
   connection.promise().query(`SELECT * FROM ${table_name}`)
@@ -202,14 +209,21 @@ function updateEmployeeRole(employee_id, newRole_id, connection) {
         .catch(err => console.error(err));
     })
     .catch((err) => console.error(err));
-
-
 }
 
 
 // Update Employee manager
 
 function updateEmployeeManager(employee_id, newManager_id, connection) {
+  connection.promise().query(`UPDATE employee SET manager_id = "${newManager_id}" WHERE id = ${employee_id}`)
+    .then(([rows]) => {
+      console.table(rows);
+      loadMainMenu()
+        .then((data) => { processMenuSelection(data) })
+        .catch(err => console.error(err));
+    })
+    .catch((err) => console.error(err));
+
 
 }
 
@@ -222,10 +236,13 @@ function updateEmployeeManager(employee_id, newManager_id, connection) {
 
 
 
+/***********************************************************/
 
+/***********************************************************/
+/******  This function handles new menu selections *********/
+/***********************************************************/
 
-
-/******  This function handles new menu selections ******/
+/************************************************************/
 
 function processMenuSelection(data) {
   // Switch for possible menu imputs
@@ -287,25 +304,25 @@ function processMenuSelection(data) {
             departments.push(rows[i].department_name);
           }
 
-            loadBudgetViewer(departments, rows)
-              .then((department) => {
+          loadBudgetViewer(departments, rows)
+            .then((department) => {
 
-                // A filter function to retrieve the id for the ammended department
-                function findDepartment(row) {
+              // A filter function to retrieve the id for the ammended department
+              function findDepartment(row) {
                 return row.department_name === department.name;
-                }
+              }
 
-                var department = rows.filter(findDepartment)[0].id;
+              var department = rows.filter(findDepartment)[0].id;
 
 
-                viewUtilizedBudget(department, viewDepartmentBudgetConnection);
+              viewUtilizedBudget(department, viewDepartmentBudgetConnection);
 
 
             }) //Prepared statment
             .catch(err => console.error(err));
-          })
-          .catch(err => console.error(err));
-          break;
+        })
+        .catch(err => console.error(err));
+      break;
 
     case "add a department":
       // Connect to database
@@ -465,6 +482,50 @@ function processMenuSelection(data) {
         }
 
         )
+        .catch(err => console.error(err));
+      break;
+
+      case "update an employee manager":
+      // Connect to database
+      var updateAnEmployeeManagerConnection = connectToDB(employee_db, hash);
+
+      //The server must be queried to populate these two arrays.
+      var employeeArray = [];
+
+       
+          // First the application queries all the employees
+          updateAnEmployeeManagerConnection.promise().query('SELECT * FROM employee')
+            //Then it populates the employees array.
+            .then(([employeeRows]) => {
+              for (let i = 0; i < employeeRows.length; i++) {
+                employeeArray.push(`${employeeRows[i].first_name} ${employeeRows[i].last_name}`);
+              }
+
+              //The employee Creator loads before the end of the async method
+              loadEmployeeManagerUpdater(employeeArray)
+                // Then this utility processes the creator data.
+                .then((data) => {
+
+                  // A filter function to retrieve the id for the ammended role
+                  function findManager(row) {
+                    return row.first_name + " " + row.last_name === data.manager;
+                  }
+
+                  // A filter function to retrieve the id for the ammended employee
+                  function findEmployee(row) {
+                    return row.first_name + " " + row.last_name === data.employee;
+                  }
+
+                  var manager =  employeeRows.filter(findManager)[0].id;
+                  var employee = employeeRows.filter(findEmployee)[0].id;
+
+                  //All the processed data is passed to the addEmployee function
+                  updateEmployeeManager(employee, manager, updateAnEmployeeManagerConnection);
+                })
+                .catch(err => console.error(err));
+
+
+        })
         .catch(err => console.error(err));
       break;
     default:

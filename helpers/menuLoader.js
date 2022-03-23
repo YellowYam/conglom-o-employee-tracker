@@ -8,8 +8,8 @@ function loadMainMenu() {
         type: 'list',
         name: 'menu_choice',
         message: 'Main Menu: ',
-        choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role',
-            'add an employee', 'update an employee role', 'view department total utilized budget'],
+        choices: ['view all departments', 'view department total utilized budget', 'view all roles', 'view all employees', 'add a department', 'add a role',
+            'add an employee', 'update an employee role', 'update an employee manager'],
     };
 
     return inquirer
@@ -112,6 +112,28 @@ function loadEmployeeRoleUpdater(roles, employees){
 
 }
 
+function loadEmployeeManagerUpdater(employees){
+    /** Inquirer questions to create a new employee **/
+    const employeeManagerUpdater = [
+        {
+            type: 'list',
+            name: 'employee',
+            message: 'Which employee shall be updated?',
+            choices: employees
+        },
+        {
+            type: 'list',
+            name: 'manager',
+            message: 'Choose a new manager for the employee:',
+            choices: employees
+        },
+    ];
+
+    return inquirer
+    .prompt(employeeManagerUpdater);
+
+}
+
 function loadEmployeeViewMenu(){
     /** Inquirer questions to create a new employee **/
     const employeeView = [
@@ -144,4 +166,5 @@ function loadBudgetViewer(departments){
 
 }
 module.exports = { loadMainMenu, loadDepartmentCreator, loadRoleCreator, 
-                   loadEmployeeCreator, loadEmployeeRoleUpdater, loadEmployeeViewMenu, loadBudgetViewer};
+                   loadEmployeeCreator, loadEmployeeRoleUpdater, loadEmployeeViewMenu,
+                   loadBudgetViewer, loadEmployeeManagerUpdater};
