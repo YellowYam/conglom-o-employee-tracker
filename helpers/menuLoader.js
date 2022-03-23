@@ -10,7 +10,7 @@ function loadMainMenu() {
         message: 'Main Menu: ',
         choices: ['view all departments', 'view department total utilized budget', 'view all roles', 'view all employees', new inquirer.Separator(),  'add a department', 'add a role',
                    'add an employee', new inquirer.Separator(), 'update an employee role', 'update an employee manager' , new inquirer.Separator() , 'delete a department', 'delete a role',
-                   ,'delete an employee', , new inquirer.Separator()]
+                   ,'delete an employee', new inquirer.Separator()]
     };
 
     return inquirer
@@ -151,19 +151,19 @@ function loadEmployeeViewMenu() {
 
 }
 
-function loadBudgetViewer(departments) {
+function loadBudgetViewer() {
     /** Inquirer questions to create a new employee **/
-    const departmentSelector = [
+    const viewSelector = [
         {
             type: 'list',
-            name: 'name',
-            message: 'For which department shall the budget be viewed?',
-            choices: departments
+            name: 'view',
+            message: 'How shall the budget be viewed?',
+            choices: ['view by department', 'view total']
         },
     ];
 
     return inquirer
-        .prompt(departmentSelector);
+        .prompt(viewSelector);
 
 }
 

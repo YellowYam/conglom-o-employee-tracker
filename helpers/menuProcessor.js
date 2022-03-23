@@ -7,7 +7,7 @@ const cTable = require('console.table');
 const { loadMainMenu, loadDepartmentCreator, loadRoleCreator,
   loadEmployeeCreator, loadEmployeeRoleUpdater, loadEmployeeViewMenu,
   loadBudgetViewer, loadEmployeeManagerUpdater, loadEmployeeDeletion,
-   loadRoleDeletion, loadDepartmentDeletion }
+  loadRoleDeletion, loadDepartmentDeletion }
   = require('./menuLoader');
 
 //MySQL pwd 
@@ -138,19 +138,32 @@ function viewEmployeesByDepartmentTable(connection) {
 }
 
 // View total utilized budget for department (sum all employee salaries)
-function viewUtilizedBudget(department_id, connection) {
-  connection.promise().query(`SELECT    
+function viewUtilizedBudget(connection) {
+  connection.promise().query(`SELECT department.id, department.department_name,
                               SUM(employeeSalaries.salary) AS Total_Utilized_Budget
-                              FROM         
-                              (SELECT 
-                                 employee.id,
-                                 role.salary,
-                                 role.department_id
-                               FROM employee
-                               LEFT JOIN role ON employee.role_id = role.id)
-                               AS employeeSalaries
-                               LEFT JOIN department ON employeeSalaries.department_id = department.id
-                               WHERE department.id = ${department_id}`)
+                              FROM  (SELECT  employee.id, role.salary, role.department_id FROM employee
+                              LEFT JOIN role ON employee.role_id = role.id)  AS employeeSalaries
+                              LEFT JOIN department ON employeeSalaries.department_id = department.id WHERE department_id IS NOT NULL
+                              GROUP BY department.id ORDER BY department.id`)
+    .then(([rows]) => {
+      console.table(rows);
+      loadMainMenu()
+        .then((data) => { processMenuSelection(data) })
+        .catch(err => console.error(err));
+    })
+    .catch((err) => console.error(err));
+
+}
+
+// View total utilized budget for department (sum all employee salaries)
+function viewTotalUtilizedBudget(connection) {
+  connection.promise().query(`SELECT
+                              SUM(employeeSalaries.salary) AS Total_Utilized_Budget
+                              FROM  (SELECT  employee.id, role.salary, role.department_id FROM employee
+                              LEFT JOIN role ON employee.role_id = role.id) 
+                              AS employeeSalaries
+                              LEFT JOIN department ON employeeSalaries.department_id = department.id 
+                              WHERE department_id IS NOT NULL`)
     .then(([rows]) => {
       console.table(rows);
       loadMainMenu()
@@ -246,13 +259,13 @@ function deleteDepartment(department_id, connection) {
 
 function deleteRole(role_id, connection) {
   connection.promise().query(`DELETE FROM role WHERE id = ${role_id}`)
-  .then(([rows]) => {
-    console.table(rows);
-    loadMainMenu()
-      .then((data) => { processMenuSelection(data) })
-      .catch(err => console.error(err));
-  })
-  .catch((err) => console.error(err));
+    .then(([rows]) => {
+      console.table(rows);
+      loadMainMenu()
+        .then((data) => { processMenuSelection(data) })
+        .catch(err => console.error(err));
+    })
+    .catch((err) => console.error(err));
 
 
 }
@@ -261,13 +274,13 @@ function deleteRole(role_id, connection) {
 
 function deleteEmployee(employee_id, connection) {
   connection.promise().query(`DELETE FROM employee WHERE id = ${employee_id}`)
-  .then(([rows]) => {
-    console.table(rows);
-    loadMainMenu()
-      .then((data) => { processMenuSelection(data) })
-      .catch(err => console.error(err));
-  })
-  .catch((err) => console.error(err));
+    .then(([rows]) => {
+      console.table(rows);
+      loadMainMenu()
+        .then((data) => { processMenuSelection(data) })
+        .catch(err => console.error(err));
+    })
+    .catch((err) => console.error(err));
 
 }
 
@@ -342,18 +355,16 @@ function processMenuSelection(data) {
             departments.push(rows[i].department_name);
           }
 
-          loadBudgetViewer(departments, rows)
-            .then((department) => {
+          loadBudgetViewer(rows)
+            .then((data) => {
 
-              // A filter function to retrieve the id for the ammended department
-              function findDepartment(row) {
-                return row.department_name === department.name;
+              if(data.view === 'view by department'){
+                  viewUtilizedBudget(viewDepartmentBudgetConnection);
               }
-
-              var department = rows.filter(findDepartment)[0].id;
-
-
-              viewUtilizedBudget(department, viewDepartmentBudgetConnection);
+              else if(data.view === 'view total'){
+                  viewTotalUtilizedBudget(viewDepartmentBudgetConnection);
+              }
+              else{new Error('Could not get view');}
 
 
             }) //Prepared statment
@@ -571,102 +582,102 @@ function processMenuSelection(data) {
       // Connect to database
       var deleteAnEmployeeConnection = connectToDB(employee_db, hash);
 
-        //The server must be queried to populate the employee array.
-        var employeeArray = [];
+      //The server must be queried to populate the employee array.
+      var employeeArray = [];
 
-        // First the application queries all the employees
+      // First the application queries all the employees
       deleteAnEmployeeConnection.promise().query('SELECT * FROM employee')
-      //Then it populates the employees array.
-      .then(([employeeRows]) => {
-        for (let i = 0; i < employeeRows.length; i++) {
-          employeeArray.push(`${employeeRows[i].first_name} ${employeeRows[i].last_name}`);
-        }
+        //Then it populates the employees array.
+        .then(([employeeRows]) => {
+          for (let i = 0; i < employeeRows.length; i++) {
+            employeeArray.push(`${employeeRows[i].first_name} ${employeeRows[i].last_name}`);
+          }
           //The employee Deleter loads before the end of the async method
           loadEmployeeDeletion(employeeArray)
-           // Then this utility processes the creator data.
-           .then((data) => {
+            // Then this utility processes the creator data.
+            .then((data) => {
 
-            // A filter function to retrieve the id for the ammended employee
-            function findEmployee(row) {
-              return row.first_name + " " + row.last_name === data.name;
-            }
+              // A filter function to retrieve the id for the ammended employee
+              function findEmployee(row) {
+                return row.first_name + " " + row.last_name === data.name;
+              }
 
-            var employee = employeeRows.filter(findEmployee)[0].id;
+              var employee = employeeRows.filter(findEmployee)[0].id;
 
-            //All the processed data is passed to the addEmployee function
-            deleteEmployee(employee, deleteAnEmployeeConnection);
-          })
-          .catch(err => console.error(err));
+              //All the processed data is passed to the addEmployee function
+              deleteEmployee(employee, deleteAnEmployeeConnection);
+            })
+            .catch(err => console.error(err));
         })
       break;
-      case "delete a role":
+    case "delete a role":
       // Connect to database
       var deleteARoleConnection = connectToDB(employee_db, hash);
 
-        //The server must be queried to populate the roles array.
-        var rolesArray = [];
+      //The server must be queried to populate the roles array.
+      var rolesArray = [];
 
-        // First the application queries all the roles
+      // First the application queries all the roles
       deleteARoleConnection.promise().query('SELECT * FROM role')
-      //Then it populates the employees array.
-      .then(([roleRows]) => {
-        for (let i = 0; i < roleRows.length; i++) {
-          rolesArray.push(`${roleRows[i].title}`);
-        }
+        //Then it populates the employees array.
+        .then(([roleRows]) => {
+          for (let i = 0; i < roleRows.length; i++) {
+            rolesArray.push(`${roleRows[i].title}`);
+          }
           //The employee Deleter loads before the end of the async method
           loadRoleDeletion(rolesArray)
-           // Then this utility processes the deleter data.
-           .then((data) => {
+            // Then this utility processes the deleter data.
+            .then((data) => {
 
-            // A filter function to retrieve the id for the ammended employee
-            function findRole(row) {
-              return row.title === data.title;
-            }
+              // A filter function to retrieve the id for the ammended employee
+              function findRole(row) {
+                return row.title === data.title;
+              }
 
-            var role = roleRows.filter(findRole)[0].id;
+              var role = roleRows.filter(findRole)[0].id;
 
-            //All the processed data is passed to the addEmployee function
-            deleteRole(role, deleteARoleConnection);
-          })
-          .catch(err => console.error(err));
+              //All the processed data is passed to the addEmployee function
+              deleteRole(role, deleteARoleConnection);
+            })
+            .catch(err => console.error(err));
         })
       break;
-      case "delete a department":
+    case "delete a department":
       // Connect to database
       var deleteADepartmentConnection = connectToDB(employee_db, hash);
 
-        //The server must be queried to populate the employee array.
-        var departmentArray = [];
+      //The server must be queried to populate the employee array.
+      var departmentArray = [];
 
-        // First the application queries all the employees
+      // First the application queries all the employees
       deleteADepartmentConnection.promise().query('SELECT * FROM department')
-      //Then it populates the employees array.
-      .then(([departmentRows]) => {
-        for (let i = 0; i < departmentRows.length; i++) {
-          departmentArray.push(`${departmentRows[i].department_name}`);
-        }
+        //Then it populates the employees array.
+        .then(([departmentRows]) => {
+          for (let i = 0; i < departmentRows.length; i++) {
+            departmentArray.push(`${departmentRows[i].department_name}`);
+          }
           //The employee Deleter loads before the end of the async method
           loadDepartmentDeletion(departmentArray)
-           // Then this utility processes the creator data.
-           .then((data) => {
+            // Then this utility processes the creator data.
+            .then((data) => {
 
-            // A filter function to retrieve the id for the ammended employee
-            function findDepartment(row) {
-              return row.department_name === data.name;
-            }
+              // A filter function to retrieve the id for the ammended employee
+              function findDepartment(row) {
+                return row.department_name === data.name;
+              }
 
-            var department = departmentRows.filter(findDepartment)[0].id;
+              var department = departmentRows.filter(findDepartment)[0].id;
 
-            //All the processed data is passed to the addEmployee function
-            deleteDepartment(department, deleteADepartmentConnection);
-          })
-          .catch(err => console.error(err));
+              //All the processed data is passed to the addEmployee function
+              deleteDepartment(department, deleteADepartmentConnection);
+            })
+            .catch(err => console.error(err));
         })
       break;
     default:
       console.error("No cases found");
       break;
-  } 
+  }
 }
 
 module.exports = { processMenuSelection };
