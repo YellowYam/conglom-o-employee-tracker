@@ -27,7 +27,7 @@ function connectToDB(database_name, database_password) {
       password: database_password,
       database: database_name
     },
-    console.log(`Connected to the {database} database.`)
+    console.log("\x1b[36m%s\x1b[0m", "{ Connected To Database }")
   );
 
   return db;
@@ -46,7 +46,9 @@ function viewTable(table_name, connection) {
   // Queries the database to display all the contents of the departments table
   connection.promise().query(`SELECT * FROM ${table_name}`)
     .then(([rows]) => {
-      console.table(rows);
+      console.log('\n');
+      
+      console.table("Departments", rows);
       loadMainMenu()
         .then((data) => { processMenuSelection(data) })
         .catch(err => console.error(err));
@@ -62,7 +64,8 @@ function viewRolesTable(connection) {
                               JOIN department 
                               ON role.department_id = department.id`)
     .then(([rows]) => {
-      console.table(rows);
+      console.log("\n");
+      console.table("Roles" , rows);
       loadMainMenu()
         .then((data) => { processMenuSelection(data) })
         .catch(err => console.error(err));
@@ -86,7 +89,8 @@ function viewEmployeesTable(connection) {
                                LEFT JOIN employee AS manager 
                                ON manager.id = employee.manager_id`)
     .then(([rows]) => {
-      console.table(rows);
+      console.log('\n');
+      console.table("Employees", rows);
       loadMainMenu()
         .then((data) => { processMenuSelection(data) })
         .catch(err => console.error(err));
@@ -106,7 +110,8 @@ function viewEmployeesByManagerTable(connection) {
                               ON manager.id = employee.manager_id
                               ORDER BY employee.manager_id`)
     .then(([rows]) => {
-      console.table(rows);
+      console.log("\n")
+      console.table("Employees By Manager", rows);
       loadMainMenu()
         .then((data) => { processMenuSelection(data) })
         .catch(err => console.error(err));
@@ -128,7 +133,8 @@ function viewEmployeesByDepartmentTable(connection) {
                               ON role.department_id = department.id
                               ORDER BY department.id`)
     .then(([rows]) => {
-      console.table(rows);
+      console.log('\n');
+      console.table("Employees By Department" , rows);
       loadMainMenu()
         .then((data) => { processMenuSelection(data) })
         .catch(err => console.error(err));
@@ -146,7 +152,8 @@ function viewUtilizedBudget(connection) {
                               LEFT JOIN department ON employeeSalaries.department_id = department.id WHERE department_id IS NOT NULL
                               GROUP BY department.id ORDER BY department.id`)
     .then(([rows]) => {
-      console.table(rows);
+      console.log('\n');
+      console.table("Total Utilized Budget By Department" , rows);
       loadMainMenu()
         .then((data) => { processMenuSelection(data) })
         .catch(err => console.error(err));
@@ -165,7 +172,8 @@ function viewTotalUtilizedBudget(connection) {
                               LEFT JOIN department ON employeeSalaries.department_id = department.id 
                               WHERE department_id IS NOT NULL`)
     .then(([rows]) => {
-      console.table(rows);
+      console.log('\n');
+      console.table("All Departments", rows);
       loadMainMenu()
         .then((data) => { processMenuSelection(data) })
         .catch(err => console.error(err));
@@ -178,7 +186,7 @@ function addDepartment(department_name, connection) {
   // Queries the database to add a department
   connection.promise().query(`INSERT INTO department (department_name) VALUES("${department_name}")`)
     .then(([rows]) => {
-      console.table(rows);
+      console.info("\x1b[92m%s\x1b[0m", "{ Department Added }"); // green text
       loadMainMenu()
         .then((data) => { processMenuSelection(data) })
         .catch(err => console.error(err));
@@ -191,7 +199,7 @@ function addRole(role_name, salary, department_id, connection) {
   // Queries the database to add a role
   connection.promise().query(`INSERT INTO role (title, salary, department_id) VALUES("${role_name}", ${salary}, ${department_id})`)
     .then(([rows]) => {
-      console.table(rows);
+      console.info("\x1b[92m%s\x1b[0m", "{ Role Added }"); // green text
       loadMainMenu()
         .then((data) => { processMenuSelection(data) })
         .catch(err => console.error(err));
@@ -203,7 +211,7 @@ function addEmployee(first_name, last_name, role_id, manager_id, connection) {
   // Queries the database to add an employee
   connection.promise().query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES("${first_name}", "${last_name}", ${role_id}, ${manager_id})`)
     .then(([rows]) => {
-      console.table(rows);
+      console.info("\x1b[92m%s\x1b[0m", "{ Employee Added }"); // green text
       loadMainMenu()
         .then((data) => { processMenuSelection(data) })
         .catch(err => console.error(err));
@@ -217,7 +225,7 @@ function updateEmployeeRole(employee_id, newRole_id, connection) {
   // Queries the database to update an employee role
   connection.promise().query(`UPDATE employee SET role_id = "${newRole_id}" WHERE id = ${employee_id}`)
     .then(([rows]) => {
-      console.table(rows);
+      console.warn("\x1b[33m%s\x1b[0m", "{ Employee Updated }"); // yellow text
       loadMainMenu()
         .then((data) => { processMenuSelection(data) })
         .catch(err => console.error(err));
@@ -231,7 +239,7 @@ function updateEmployeeRole(employee_id, newRole_id, connection) {
 function updateEmployeeManager(employee_id, newManager_id, connection) {
   connection.promise().query(`UPDATE employee SET manager_id = "${newManager_id}" WHERE id = ${employee_id}`)
     .then(([rows]) => {
-      console.table(rows);
+      console.info("\x1b[33m%s\x1b[0m", "{ Employee Manager Updated }"); // yellow text
       loadMainMenu()
         .then((data) => { processMenuSelection(data) })
         .catch(err => console.error(err));
@@ -246,7 +254,7 @@ function updateEmployeeManager(employee_id, newManager_id, connection) {
 function deleteDepartment(department_id, connection) {
   connection.promise().query(`DELETE FROM department WHERE id = ${department_id}`)
     .then(([rows]) => {
-      console.table(rows);
+      console.warn("\x1b[91m%s\x1b[0m", "{ Department Deleted }"); // red text
       loadMainMenu()
         .then((data) => { processMenuSelection(data) })
         .catch(err => console.error(err));
@@ -260,7 +268,7 @@ function deleteDepartment(department_id, connection) {
 function deleteRole(role_id, connection) {
   connection.promise().query(`DELETE FROM role WHERE id = ${role_id}`)
     .then(([rows]) => {
-      console.table(rows);
+      console.warn("\x1b[91m%s\x1b[0m", "{ Role Deleted }"); // red text
       loadMainMenu()
         .then((data) => { processMenuSelection(data) })
         .catch(err => console.error(err));
@@ -275,7 +283,7 @@ function deleteRole(role_id, connection) {
 function deleteEmployee(employee_id, connection) {
   connection.promise().query(`DELETE FROM employee WHERE id = ${employee_id}`)
     .then(([rows]) => {
-      console.table(rows);
+      console.warn("\x1b[91m%s\x1b[0m", "{ Employee Deleted }"); // red text
       loadMainMenu()
         .then((data) => { processMenuSelection(data) })
         .catch(err => console.error(err));
