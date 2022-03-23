@@ -8,8 +8,9 @@ function loadMainMenu() {
         type: 'list',
         name: 'menu_choice',
         message: 'Main Menu: ',
-        choices: ['view all departments', 'view department total utilized budget', 'view all roles', 'view all employees', 'add a department', 'add a role',
-            'add an employee', 'update an employee role', 'update an employee manager'],
+        choices: ['view all departments', 'view department total utilized budget', 'view all roles', 'view all employees', new inquirer.Separator(),  'add a department', 'add a role',
+                   'add an employee', new inquirer.Separator(), 'update an employee role', 'update an employee manager' , new inquirer.Separator() , 'delete a department', 'delete a role',
+                   ,'delete an employee', , new inquirer.Separator()]
     };
 
     return inquirer
@@ -59,9 +60,9 @@ function loadRoleCreator(departments) {
         .prompt(roleCreator);
 }
 
-function loadEmployeeCreator(roles, employees){
-     /** Inquirer questions to create a new employee **/
-     const employeeCreator = [
+function loadEmployeeCreator(roles, employees) {
+    /** Inquirer questions to create a new employee **/
+    const employeeCreator = [
         {
             type: 'input',
             name: 'first_name',
@@ -87,10 +88,10 @@ function loadEmployeeCreator(roles, employees){
     ];
 
     return inquirer
-    .prompt(employeeCreator);
+        .prompt(employeeCreator);
 }
 
-function loadEmployeeRoleUpdater(roles, employees){
+function loadEmployeeRoleUpdater(roles, employees) {
     /** Inquirer questions to create a new employee **/
     const employeeRoleUpdater = [
         {
@@ -108,11 +109,11 @@ function loadEmployeeRoleUpdater(roles, employees){
     ];
 
     return inquirer
-    .prompt(employeeRoleUpdater);
+        .prompt(employeeRoleUpdater);
 
 }
 
-function loadEmployeeManagerUpdater(employees){
+function loadEmployeeManagerUpdater(employees) {
     /** Inquirer questions to create a new employee **/
     const employeeManagerUpdater = [
         {
@@ -130,11 +131,11 @@ function loadEmployeeManagerUpdater(employees){
     ];
 
     return inquirer
-    .prompt(employeeManagerUpdater);
+        .prompt(employeeManagerUpdater);
 
 }
 
-function loadEmployeeViewMenu(){
+function loadEmployeeViewMenu() {
     /** Inquirer questions to create a new employee **/
     const employeeView = [
         {
@@ -146,11 +147,11 @@ function loadEmployeeViewMenu(){
     ];
 
     return inquirer
-    .prompt(employeeView);
+        .prompt(employeeView);
 
 }
 
-function loadBudgetViewer(departments){
+function loadBudgetViewer(departments) {
     /** Inquirer questions to create a new employee **/
     const departmentSelector = [
         {
@@ -162,9 +163,61 @@ function loadBudgetViewer(departments){
     ];
 
     return inquirer
-    .prompt(departmentSelector);
+        .prompt(departmentSelector);
 
 }
-module.exports = { loadMainMenu, loadDepartmentCreator, loadRoleCreator, 
-                   loadEmployeeCreator, loadEmployeeRoleUpdater, loadEmployeeViewMenu,
-                   loadBudgetViewer, loadEmployeeManagerUpdater};
+
+function loadEmployeeDeletion(employees) {
+    /** Inquirer questions to create a new employee **/
+    const employeeSelector = [
+        {
+            type: 'list',
+            name: 'name',
+            message: 'Which employee shall be deleted?',
+            choices: employees
+        },
+    ];
+
+    return inquirer
+        .prompt(employeeSelector);
+
+}
+
+function loadRoleDeletion(roles) {
+    /** Inquirer questions to create a new employee **/
+    const roleSelector = [
+        {
+            type: 'list',
+            name: 'title',
+            message: 'Which role shall be deleted?',
+            choices: roles
+        },
+    ];
+
+    return inquirer
+        .prompt(roleSelector);
+
+}
+
+function loadDepartmentDeletion(departments) {
+    /** Inquirer questions to create a new employee **/
+    const departmentSelector = [
+        {
+            type: 'list',
+            name: 'name',
+            message: 'Which department shall be deleted?',
+            choices: departments
+        },
+    ];
+
+    return inquirer
+        .prompt(departmentSelector);
+
+}
+
+module.exports = {
+    loadMainMenu, loadDepartmentCreator, loadRoleCreator,
+    loadEmployeeCreator, loadEmployeeRoleUpdater, loadEmployeeViewMenu,
+    loadBudgetViewer, loadEmployeeManagerUpdater, loadEmployeeDeletion,
+    loadRoleDeletion, loadDepartmentDeletion
+};
