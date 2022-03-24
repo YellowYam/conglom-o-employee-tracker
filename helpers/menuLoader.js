@@ -7,10 +7,11 @@ function loadMainMenu() {
     const mainMenu = {
         type: 'list',
         name: 'menu_choice',
+        loop: true,
         message: 'Main Menu: ',
         choices: ['view all departments', 'view department total utilized budget', 'view all roles', 'view all employees', new inquirer.Separator(),  'add a department', 'add a role',
-                   'add an employee', new inquirer.Separator(), 'update an employee role', 'update an employee manager' , new inquirer.Separator() , 'delete a department', 'delete a role',
-                   ,'delete an employee', new inquirer.Separator()]
+                   'add an employee', new inquirer.Separator(), 'update an employee role', 'update an employee manager' , new inquirer.Separator() , 'delete a department', 'delete a role'
+                   ,'delete an employee', new inquirer.Separator(),]
     };
 
     return inquirer
