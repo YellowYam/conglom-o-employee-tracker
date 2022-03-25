@@ -31,7 +31,7 @@
   + [MySQL2](https://www.npmjs.com/package/mysql2) - connects the SQL database to Node.js
   + [Bcrypt](https://www.npmjs.com/package/bcrypt) - hashes the database password
   + [Console Table](https://www.npmjs.com/package/console.table) - displays database information
-  
+
   ### MySQL
 
   The database must be installed onto your personal PC to load the database. [This Installation Guide](https://coding-boot-camp.github.io/full-stack/mysql/mysql-installation-guide) contains all the instructions. Once the database has been installed, the schema and seed must be loaded into the database.
@@ -43,9 +43,12 @@
   5. Run <code>source seed.sql</code>
 
 ## Usage
+
 1. Run <code> npm start </code> to begin the app. (Note that the logo will only appear on console windows large enough to display it.)
 2. Use the arrow keys to navigate menu choices. Enter selects an option.
 3. Press <code>Ctl + C</code> to exit the app.
+
+#### A [Walkthrough Video]() is available. 
 
   ## Contributors
   If you would like to become a contributor on this project, please find my contact information in the [questions](#questions)

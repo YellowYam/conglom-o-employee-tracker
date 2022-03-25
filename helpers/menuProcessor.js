@@ -59,9 +59,9 @@ function viewTable(table_name, connection) {
 function viewRolesTable(connection) {
   //Queries the database to display all the contents of the roles table
   connection.promise().query(`SELECT role.id AS id, role.title AS title, role.salary AS salary, 
-                              department.department_name AS department 
+                              IFNULL(department.department_name, "No Department") AS department 
                               FROM role 
-                              JOIN department 
+                              LEFT JOIN department 
                               ON role.department_id = department.id`)
     .then(([rows]) => {
       console.log("\n");
@@ -82,9 +82,9 @@ function viewEmployeesTable(connection) {
                                IFNULL(department.department_name, "No Department") AS Department,
                                IFNULL(CONCAT(manager.first_name, " ",  manager.last_name), "No Manager") AS Manager
                                FROM employee 
-                               INNER JOIN role 
+                               LEFT JOIN role 
                                ON employee.role_id = role.id 
-                               INNER JOIN department 
+                               LEFT JOIN department 
                                ON role.department_id = department.id
                                LEFT JOIN employee AS manager 
                                ON manager.id = employee.manager_id`)
