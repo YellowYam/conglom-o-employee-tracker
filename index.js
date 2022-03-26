@@ -5,7 +5,7 @@ const { loadMainMenu } = require('./helpers/menuLoader');
 const employee_db = "employee_db";
 
 const employeeManagerLogo =
-   ",----------------------------------------------------------------------------------------------.\n"
+   ",----------------------------------------------------------------------------------------------.\r\n"
   +"|   :::::::::: ::::    ::::  :::::::::  :::         ::::::::  :::   ::: :::::::::: ::::::::::  |\n"                                       
   +"|   :+:        +:+:+: :+:+:+ :+:    :+: :+:        :+:    :+: :+:   :+: :+:        :+:         |\n"
   +"|   +:+        +:+ +:+:+ +:+ +:+    +:+ +:+        +:+    +:+  +:+ +:+  +:+        +:+         |\n"
@@ -41,7 +41,9 @@ function init() {
   loadMainMenu()
   .then((data) => {processMenuSelection(data)})  // Processes this information recursively
   .catch(err => console.error(err));
+ 
 }
   
 
 init();
+
