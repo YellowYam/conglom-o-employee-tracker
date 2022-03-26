@@ -63,6 +63,10 @@ function loadRoleCreator(departments) {
 
 function loadEmployeeCreator(roles, employees) {
     /** Inquirer questions to create a new employee **/
+    employees.unshift(new inquirer.Separator());
+    employees.unshift('No Manager');
+    employees.unshift(new inquirer.Separator());
+
     const employeeCreator = [
         {
             type: 'input',
@@ -94,6 +98,7 @@ function loadEmployeeCreator(roles, employees) {
 
 function loadEmployeeRoleUpdater(roles, employees) {
     /** Inquirer questions to create a new employee **/
+    
     const employeeRoleUpdater = [
         {
             type: 'list',
@@ -105,7 +110,7 @@ function loadEmployeeRoleUpdater(roles, employees) {
             type: 'list',
             name: 'role',
             message: 'Choose a new role for the employee:',
-            choices: roles
+            choices: roles,
         },
     ];
 
@@ -116,6 +121,8 @@ function loadEmployeeRoleUpdater(roles, employees) {
 
 function loadEmployeeManagerUpdater(employees) {
     /** Inquirer questions to create a new employee **/
+
+
     const employeeManagerUpdater = [
         {
             type: 'list',

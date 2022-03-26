@@ -3,7 +3,7 @@
   ## Description
   A console interface that connects with a MySQL back-end and queries an employee database.
 
-  ##### A [Walkthrough Video]() is available. <br><br>
+  ##### A [Walkthrough Video](https://drive.google.com/file/d/1NGVhqaDkOXkH9jkXjmc2tFypED-TGcG5/view) is available. <br><br>
 
   ## TOC
   1. [Installation](#installation)   
@@ -48,7 +48,7 @@
 2. Use the arrow keys to navigate menu choices. Enter selects an option.
 3. Press <code>Ctl + C</code> to exit the app.
 
-#### A [Walkthrough Video]() is available. 
+#### A [Walkthrough Video](https://drive.google.com/file/d/1NGVhqaDkOXkH9jkXjmc2tFypED-TGcG5/view) is available. 
 
   ## Contributors
   If you would like to become a contributor on this project, please find my contact information in the [questions](#questions)

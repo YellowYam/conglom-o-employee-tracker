@@ -430,7 +430,7 @@ function processMenuSelection(data) {
 
       //The server must be queried to populate these two arrays.
       var roles = [];
-      var employees = ['None'];
+      var employees = [];
 
       //First the application queries all the roles.
       addAnEmployeeConnection.promise().query('SELECT * FROM role')
@@ -467,8 +467,17 @@ function processMenuSelection(data) {
                   }
 
                   var role = roleRows.filter(findRole)[0].id;
-                  var manager = employeeRows.filter(findManager)[0].id;
 
+                  if( data.manager === "No Manager"){
+                    manager = null;
+                  }
+                  else{
+                  var manager = employeeRows.filter(findManager)[0].id;
+                  }
+                  
+                
+    
+                  
 
                   //All the processed data is passed to the addEmployee function
                   addEmployee(data.first_name, data.last_name, role, manager, addAnEmployeeConnection);
@@ -524,8 +533,10 @@ function processMenuSelection(data) {
                   function findEmployee(row) {
                     return row.first_name + " " + row.last_name === data.employee;
                   }
-
-                  var role = roleRows.filter(findRole)[0].id;
+                  
+                  
+                    var role = roleRows.filter(findRole)[0].id;
+                
                   var employee = employeeRows.filter(findEmployee)[0].id;
 
                   //All the processed data is passed to the addEmployee function
@@ -573,8 +584,12 @@ function processMenuSelection(data) {
                 return row.first_name + " " + row.last_name === data.employee;
               }
 
-              var manager = employeeRows.filter(findManager)[0].id;
+              
               var employee = employeeRows.filter(findEmployee)[0].id;
+              
+              var manager = employeeRows.filter(findManager)[0].id;
+
+             
 
               //All the processed data is passed to the addEmployee function
               updateEmployeeManager(employee, manager, updateAnEmployeeManagerConnection);
