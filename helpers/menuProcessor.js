@@ -254,7 +254,7 @@ function updateEmployeeManager(employee_id, newManager_id, connection) {
 function deleteDepartment(department_id, connection) {
   connection.promise().query(`DELETE FROM department WHERE id = ${department_id}`)
     .then(([rows]) => {
-      console.warn("\x1b[91m%s\x1b[0m", "{ Department Deleted }"); // red text
+      console.warn("\x1b[95m%s\x1b[0m", "{ Department Deleted }"); // purple text
       loadMainMenu()
         .then((data) => { processMenuSelection(data) })
         .catch(err => console.error(err));
@@ -268,7 +268,7 @@ function deleteDepartment(department_id, connection) {
 function deleteRole(role_id, connection) {
   connection.promise().query(`DELETE FROM role WHERE id = ${role_id}`)
     .then(([rows]) => {
-      console.warn("\x1b[91m%s\x1b[0m", "{ Role Deleted }"); // red text
+      console.warn("\x1b[95m%s\x1b[0m", "{ Role Deleted }"); // purple text
       loadMainMenu()
         .then((data) => { processMenuSelection(data) })
         .catch(err => console.error(err));
@@ -283,7 +283,7 @@ function deleteRole(role_id, connection) {
 function deleteEmployee(employee_id, connection) {
   connection.promise().query(`DELETE FROM employee WHERE id = ${employee_id}`)
     .then(([rows]) => {
-      console.warn("\x1b[91m%s\x1b[0m", "{ Employee Deleted }"); // red text
+      console.warn("\x1b[95m%s\x1b[0m", "{ Employee Deleted }"); // purple text
       loadMainMenu()
         .then((data) => { processMenuSelection(data) })
         .catch(err => console.error(err));
